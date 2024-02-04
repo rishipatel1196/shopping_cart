@@ -64,6 +64,7 @@ class CartController extends Controller
         $itemsWithDetails = [];
 
         foreach ($cartItems as $cartItem) {
+            $individualProductDiscount = 0;
             $product = $cartItem->product_details;
             $quantity = $cartItem->quantity;
 
@@ -71,12 +72,14 @@ class CartController extends Controller
             if ($product->name === 'A' && $quantity >= 3) {
                 $setsOfThree = floor($quantity / 3);
                  $totalDiscount += $setsOfThree * ($product->price * 3 - 75);
+                $individualProductDiscount = $setsOfThree * ($product->price * 3 - 75);
             }
 
             //2: If 2 of Item B is purchased, the price of both is Rs 35
             if ($product->name === 'B' && $quantity >= 2) {
                 $setsOfTwo = floor($quantity / 2);
-                 $totalDiscount += $setsOfTwo * ($product->price * 2 - 35);
+                $totalDiscount += $setsOfTwo * ($product->price * 2 - 35);
+                $individualProductDiscount = $setsOfTwo * ($product->price * 2 - 35);
             }
 
             $totalPrice += $product->price * $quantity;
@@ -85,9 +88,12 @@ class CartController extends Controller
                 'product_id' => $product->id,
                 'product_name' => $product->name,
                 'quantity' => $quantity,
-                'individual_price' => $product->price,
-                'discount_applied' => $totalDiscount,
-                'total_price' => $totalPrice,
+                'product_price' => $product->price,
+                // 'discount_applied' => $totalDiscount,
+                'discount_applied' => $individualProductDiscount,
+                // 'total_price' => $totalPrice,
+                'total_price' => $product->price * $quantity,
+                'total_price_with_discount' => ($product->price * $quantity) - $individualProductDiscount,
             ];
 
         }
